@@ -56,49 +56,28 @@ function initNavbarScroll() {
     });
 }
 
-// Enhanced typing animation that preserves space
+// Enhanced typing animation that stays permanent
 function initTypingAnimation() {
     const typingElement = document.querySelector('.typing-animation');
     if (!typingElement) return;
     
     const text = 'Pieter';
     let charIndex = 0;
-    let isDeleting = false;
-    let isPaused = false;
     
     // Start with empty text but element keeps its min-width
     typingElement.textContent = '';
     
     const typeWriter = () => {
-        if (isPaused) {
-            setTimeout(typeWriter, 3000); // Pause for 3 seconds before deleting
-            isPaused = false;
-            return;
+        // Typing only once
+        typingElement.textContent = text.substring(0, charIndex + 1);
+        charIndex++;
+        
+        if (charIndex === text.length) {
+            // Keep the cursor blinking permanently - animation continues via CSS
+            return; 
         }
         
-        if (!isDeleting) {
-            // Typing
-            typingElement.textContent = text.substring(0, charIndex + 1);
-            charIndex++;
-            
-            if (charIndex === text.length) {
-                isPaused = true;
-                isDeleting = true;
-            }
-            
-            setTimeout(typeWriter, 150);
-        } else {
-            // Deleting
-            typingElement.textContent = text.substring(0, charIndex - 1);
-            charIndex--;
-            
-            if (charIndex === 0) {
-                isDeleting = false;
-                setTimeout(typeWriter, 500);
-            } else {
-                setTimeout(typeWriter, 75);
-            }
-        }
+        setTimeout(typeWriter, 150);
     };
     
     // Start typing animation after a delay
@@ -159,10 +138,11 @@ function initMouseEffects() {
 
 // Initialize all functions when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing...');
     initThemeSystem(); // Initialize theme system first
     createStars();
     createFloatingParticles();
-    createMatrixRain();
+    createMatrixRain(); // Create matrix rain immediately
     initSmoothScrolling();
     initNavbarScroll();
     initTypingAnimation();
@@ -177,6 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileNav();
     updateActiveNavLink();
 });
+
+// Matrix rain is now created immediately in DOMContentLoaded
 
 // Add active nav link highlighting
 function updateActiveNavLink() {
@@ -205,18 +187,30 @@ function updateActiveNavLink() {
 }
 
 // Initialize active nav link highlighting
-document.addEventListener('DOMContentLoaded', updateActiveNavLink);// Floating particles animation
+document.addEventListener('DOMContentLoaded', updateActiveNavLink);// Enhanced floating particles animation
 function createFloatingParticles() {
-    const particleContainer = document.createElement('div');
-    particleContainer.className = 'floating-particles';
-    document.body.appendChild(particleContainer);
+    let particleContainer = document.querySelector('.floating-particles');
+    if (!particleContainer) {
+        particleContainer = document.createElement('div');
+        particleContainer.className = 'floating-particles';
+        document.body.appendChild(particleContainer);
+    }
     
-    for (let i = 0; i < 20; i++) {
+    // Create more animated particles
+    for (let i = 0; i < 40; i++) {
         const particle = document.createElement('div');
-        particle.className = 'particle';
+        particle.className = 'animated-particle';
+        
+        // Random positioning and timing
         particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 10 + 's';
-        particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+        
+        // Random size and color variation
+        const size = Math.random() * 4 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
         particleContainer.appendChild(particle);
     }
 }
@@ -275,29 +269,102 @@ function initTextRevealAnimation() {
 
 // Matrix rain effect for hero background
 function createMatrixRain() {
-    const canvas = document.createElement('canvas');
-    canvas.className = 'matrix-rain';
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    const heroSection = document.querySelector('.hero');
-    if (!heroSection) return; // Add null check
-    
-    heroSection.appendChild(canvas);
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return; // Add context check
+    try {
+        console.log('🌧️ Creating matrix rain...');
+        const canvas = document.createElement('canvas');
+        canvas.className = 'matrix-rain';
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.zIndex = '-10';
+        canvas.style.opacity = '0.15';
+        canvas.style.pointerEvents = 'none';
+        
+        // Set canvas to cover the entire document
+        const updateCanvasSize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight,
+                4000 // Minimum height to ensure coverage
+            );
+            console.log('📐 Matrix canvas size:', canvas.width, 'x', canvas.height);
+        };
+        
+        updateCanvasSize();
+        
+        // Insert as first child of body (behind all content)
+        document.body.insertBefore(canvas, document.body.firstChild);
+        console.log('✅ Matrix canvas added to DOM');
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('❌ Failed to get canvas context');
+            return;
+        }
     
     const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
     const matrixArray = matrix.split("");
     
-    const fontSize = 10;
+    const fontSize = 12;
     const columns = canvas.width / fontSize;
     const drops = [];
     
+    // Initialize drops
     for (let x = 0; x < columns; x++) {
-        drops[x] = 1;
+        drops[x] = Math.random() * canvas.height / fontSize;
     }
+    
+    function draw() {
+        try {
+            // Semi-transparent background to create trail effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Matrix text color
+            ctx.fillStyle = '#6366f1';
+            ctx.font = fontSize + 'px monospace';
+            
+            // Draw matrix characters
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                // Reset drop when it reaches bottom
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        } catch (error) {
+            console.error('❌ Matrix rain draw error:', error);
+        }
+    }
+    
+    // Start animation
+    console.log('🎬 Starting matrix rain animation...');
+    const intervalId = setInterval(draw, 50);
+    console.log('✅ Matrix rain animation started with interval:', intervalId);
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        updateCanvasSize();
+        // Recalculate drops for new width
+        const newColumns = canvas.width / fontSize;
+        drops.length = newColumns;
+        for (let x = 0; x < newColumns; x++) {
+            if (drops[x] === undefined) {
+                drops[x] = Math.random() * canvas.height / fontSize;
+            }
+        }
+    });
+    
+    return intervalId;
+    
+    } catch (error) {
+        console.error('❌ Matrix rain creation failed:', error);
+    }
+}
     
     function draw() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
@@ -319,23 +386,25 @@ function createMatrixRain() {
     
     const intervalId = setInterval(draw, 35);
     
-    // Resize canvas on window resize
+    // Resize canvas on window resize and ensure full content coverage
     const resizeHandler = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        setCanvasSize();
+        
+        // Recalculate drops array for new width
+        const newColumns = canvas.width / fontSize;
+        drops.length = 0;
+        for (let x = 0; x < newColumns; x++) {
+            drops[x] = 1;
+        }
     };
     
     window.addEventListener('resize', resizeHandler);
     
-    // Cleanup function to prevent memory leaks
-    return () => {
-        clearInterval(intervalId);
-        window.removeEventListener('resize', resizeHandler);
-        if (canvas.parentNode) {
-            canvas.parentNode.removeChild(canvas);
-        }
-    };
+    } catch (error) {
+        console.error('❌ Matrix rain creation failed:', error);
+    }
 }
+
 // Enhanced mouse tracking for hero section (DISABLED)
 function initHeroMouseTracking() {
     // Mouse tracking disabled - no movement effects

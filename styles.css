@@ -386,9 +386,36 @@ body {
 
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    grid-template-rows: auto auto;
+    gap: 0.2rem;
+    row-gap: 1.1rem;
     align-items: start;
+    justify-items: center;
+}
+
+.project-card:nth-child(1),
+.project-card:nth-child(2),
+.project-card:nth-child(3) {
+    grid-row: 1;
+    width: 100%;
+    max-width: 450px;
+}
+
+.project-card:nth-child(4) {
+    grid-row: 2;
+    grid-column: 1 / 2;
+    width: 100%;
+    max-width: 450px;
+    margin-left: 95%;
+}
+
+.project-card:nth-child(5) {
+    grid-row: 2;
+    grid-column: 3 / 4;
+    width: 100%;
+    max-width: 450px;
+    margin-right: 95%;
 }
 
 .project-card {
@@ -402,6 +429,9 @@ body {
     position: relative;
     overflow: hidden;
     min-height: 450px;
+    height: 520px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-card:hover {
@@ -582,13 +612,20 @@ body {
     }
 }
 
-/* Matrix Rain Effect */
+/* Matrix Rain Effect - Full Document Coverage */
 .matrix-rain {
     position: absolute;
     top: 0;
     left: 0;
-    opacity: 0.1;
-    z-index: 0;
+    width: 100%;
+    opacity: 0.15;
+    z-index: -10;
+    pointer-events: none;
+}
+
+/* Ensure body has relative positioning for absolute matrix rain */
+body {
+    position: relative;
 }
 
 /* Enhanced Skill Tag Animations */
@@ -907,7 +944,7 @@ body {
     }
     
     .projects-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
     
@@ -1112,10 +1149,19 @@ body {
 }
 
 /* Tablet breakpoint */
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
     .projects-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto auto auto;
         gap: 1.5rem;
+    }
+    
+    .project-card:nth-child(4),
+    .project-card:nth-child(5) {
+        grid-row: auto;
+        grid-column: auto;
+        margin: 0;
+        max-width: none;
     }
     
     .project-card {
@@ -1135,4 +1181,170 @@ body {
         min-height: 350px;
     }
 }
+}
+/* Neural Network Card Special Styling */
+.neural-network-card {
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.15) 0%, 
+        rgba(37, 99, 235, 0.1) 50%, 
+        rgba(29, 78, 216, 0.15) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.neural-network-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(59, 130, 246, 0.2), 
+        transparent);
+    transition: left 0.7s;
+    z-index: 1;
+}
+
+.neural-network-card:hover::before {
+    left: 100%;
+}
+
+.neural-network-card:hover {
+    transform: translateY(-10px);
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.25) 0%, 
+        rgba(37, 99, 235, 0.2) 50%, 
+        rgba(29, 78, 216, 0.25) 100%);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.neural-network-card .project-image i {
+    color: #3b82f6;
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.2) 0%, 
+        rgba(37, 99, 235, 0.15) 100%);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.neural-network-card:hover .project-image i {
+    color: #60a5fa;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsive adjustments for 3-2 layout */
+@media (max-width: 1200px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto auto auto;
+    }
+    
+    .project-card:nth-child(4),
+    .project-card:nth-child(5) {
+        grid-row: auto;
+        grid-column: auto;
+        margin: 0;
+        max-width: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .project-card:nth-child(4),
+    .project-card:nth-child(5) {
+        grid-row: auto;
+        grid-column: auto;
+        margin: 0;
+        max-width: none;
+    }
+}
+
+/* Consistent card heights and responsive text */
+.project-content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-content p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    flex: 1;
+    font-size: 0.95rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
+}
+
+/* Specific adjustments for longer descriptions */
+.project-card:nth-child(4) .project-content p,
+.project-card:nth-child(5) .project-content p {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    -webkit-line-clamp: 9;
+}
+
+.project-tech {
+    margin-top: auto;
+}
+
+.project-links {
+    margin-top: 1rem;
+}
+
+/* Animated floating particles instead of static stars */
+.animated-particle {
+    position: absolute;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: floatUp linear infinite;
+    box-shadow: 0 0 6px var(--accent-primary);
+}
+
+@keyframes floatUp {
+    from {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1) translateX(20px);
+    }
+    to {
+        transform: translateY(-100px) translateX(-20px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Enhanced floating particles container */
+.floating-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+/* Reduce star opacity or remove stars entirely */
+.stars {
+    opacity: 0.3;
+}
+
+.star {
+    opacity: 0.2;
 }
